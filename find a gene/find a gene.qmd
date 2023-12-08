@@ -1,0 +1,48 @@
+---
+title: "find a gene"
+format: pdf
+---
+
+```{r}
+library(bio3d)
+```
+```{r}
+seq <- read.fasta("fasta")
+```
+```{r}
+mat <- seqidentity(seq)
+mat
+```
+```{r}
+library(ggplot2)
+library(reshape2)
+library(RColorBrewer)
+```
+```{r}
+melted_mat <- melt(mat)
+```
+```{r}
+color <- brewer.pal(n = 9, name = "YlGnBu") 
+```
+```{r}
+ggplot(data = melted_mat, aes(Var1, Var2, fill = value)) +
+  geom_tile() + 
+  scale_fill_gradient2(low = "yellow", high = "red", mid = "orange",
+                       midpoint = 0, limit = c(-1, 1)) +
+  theme(axis.text.x = element_text(angle = 45, vjust = 1, 
+                                   size = 8, hjust = 1)) +
+  coord_fixed()
+```
+```{r}
+library(bio3d) 
+
+myseq <- "MAADSDDGGLSVPPTSDGVVNKNTKSEEEFVIRVPVVDVQTDNFKEIWPSLLLALKTASFVAVDTELSGLGDRKSLLNQCIEERYKAVCHAARTRSVLSLGLACFKQQPDKGENSYLAQVFNLTLLCMEEYVIEPKSVQFLVQHGFNFNRQYAQGIPYHKGNDKGDESQSQSVRTLFLELIRARRPLVLHNGLIDLVFLYQNFYAHLPENLGTFTADLCEMFPAGIYDTKYAAEFHARFVASYLEYAFRKCERENGKQRAAGSPHLALEFCSYPSSMRGHIDYRCCMSPVTYHRSHTGGICDKFSAYGWCPLGPQCPQSHDIDLIIDTDEAVAEDKRRRRRRKDKRRRALLSQPGMQTFEEAEEGPPTKQVCEDSLKTENTEQKVAEGETRDQPGSKQGHKGGLEMEHEAVSSEIADVATSELPVNQTSPNPVPGDGLHRAGFDAFMTGYVMAYVGLSQGTQLCSSEPWLPECHNKVYLSGKTVPLTVAKSQFSRPSKAHNQKMKLAWGSS"
+```
+
+
+
+
+
+
+
+

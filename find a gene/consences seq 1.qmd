@@ -1,0 +1,39 @@
+---
+title: "atomic resolution structures"
+format: pdf
+---
+```{r}
+library(bio3d)
+```
+
+```{r}
+aln <- read.fasta("pleasework")
+aln
+```
+```{r}
+consensus <- consensus(aln)
+```
+```{r}
+print(consensus)
+```
+
+```{r}
+consensus_seq <- consensus[[1]]
+names(consensus_seq) <- "consensus"
+```
+
+```{r}
+writeLines(paste0(">", names(consensus_seq), 
+                  "\n",consensus_seq), 
+           con="consensus.fasta")
+```
+
+```{r}
+
+```
+```{r}
+seq <- read.fasta("consensus.fasta")
+```
+
+
+
