@@ -1,0 +1,91 @@
+---
+title: "Class 7: 1 Machine Learning"
+format: html
+---
+
+
+#clustering
+We will start with k-means clustering, one od the most prevelent of all clustering methods. Fast and could use large data set. Disadvantage is need to tell it value of k (how many clusters). 
+
+To get started let's make some data up:
+```{r}
+rnorm(10)
+```
+#rnorm will give you a random numbers. Could get a histogram of values. 
+```{r}
+hist(rnorm(1000, mean=3))
+```
+```{r}
+tmp<-rnorm(30,3)
+tmp
+```
+```{r}
+tmp <- c(rnorm(30, 3), rnorm(30,-3))
+x<-cbind(x=tmp, y=rev(tmp))
+plot(x)
+```
+The main function in R for k-means clustering is called `kmeans().
+```{r}
+k<-kmeans(x, centers=2, nstart=20)
+k
+```
+"centers" in k is the number of clusters you want (ie k)
+>Q1. How many points are in each cluster?
+
+```{r}
+k$size
+```
+>Q2. The clustering result i.e. membership vector?
+
+```{r}
+k$cluster
+```
+>Q3. cluster centers
+
+```{r}
+k$centers
+```
+>Q4. Make a plot of our data colored by clustering results with optionally the clusters centers shown.
+
+```{r}
+plot(x, col=c("red", "blue"))
+```
+```{r}
+plot(x, col=k$cluster, pch=16)
+points(k$centers, col="blue", pch=20, cex=2)
+```
+"pch" is the size of dots
+>Q5. Run the kmeans again but cluster into 3 groups and plot the results like we did above. 
+
+```{r}
+k<-kmeans(x, centers=3, nstart=20)
+plot(x, col=k$cluster, pch=16)
+```
+k-means will always return a clustering result - even if there is no clear groupings.
+
+#hierarchical clustering
+
+hierarchical clustering it has an advantage in that it can reveal the structure in your data rather than imposing a structure as k-means will.
+
+The main function in "base" R is called `hclust()'
+
+It requires a distance matrix as input, not the raw data itself. 
+```{r}
+hc<-hclust(dist(x))
+hc
+plot(hc)
+abline(h=8, col="red")
+```
+The function to get our clustering/groups from a hclust object is called `cutree()`
+```{r}
+grps<-cutree(hc, h=8)
+grps
+```
+>Q. Plot our hclust results in terms of our data colored by cluster membership. 
+
+
+```{r}
+plot(x, col=grps)
+```
+
+#principal component analysis (PCA)

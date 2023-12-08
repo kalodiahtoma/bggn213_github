@@ -1,0 +1,57 @@
+---
+title: "HW6"
+author: "Kalodiah Toma (PID A07606689)"
+format: pdf
+---
+
+
+## Load package is important
+
+It is important to place the `library(bio3d)` as part of the codes in the QMD file. When rendering it into PDF/HTML, all the codes must be run in order to successfully print the output in the rendered file. For this reason, the package has to be load every time when you render and thus needs to be part of the codes that you render.
+
+On the other hand, what shouldn't be included is `install.pacakge("bio3d")`. Obviously you don't want to install the package again and again each time you render the file.
+
+```{r}
+library(bio3d)
+```
+
+
+```{r}
+s1 <- read.pdb("4AKE")  # kinase with drug
+s2 <- read.pdb("1AKE")  # kinase no drug
+s3 <- read.pdb("1E4Y")  # kinase with drug
+s1.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s2.chainA <- trim.pdb(s2, chain="A", elety="CA")
+s3.chainA <- trim.pdb(s1, chain="A", elety="CA")
+s1.b <- s1.chainA$atom$b
+s2.b <- s2.chainA$atom$b
+s3.b <- s3.chainA$atom$b
+plotb3(s1.b, sse=s1.chainA, typ="l", ylab="Bfactor")
+plotb3(s2.b, sse=s2.chainA, typ="l", ylab="Bfactor")
+plotb3(s3.b, sse=s3.chainA, typ="l", ylab="Bfactor")
+```
+Thank you Aaron for explaining functions for over an hour on a Sunday night! 
+The name of the function is "ans". 
+The arguments of the function are protein "X", chain "Y", and elety "Z"
+The body of the function is:
+1. read the pdb for protein "X"
+2. trim the pdb for protein "X", chain "Y", and electy "Z"
+3. continue to trim (called "cut"), for data in "atom" and "b".
+4. plot the data in "cut" and "trim"
+GOT IT! :)
+
+protein <- read.pdb (X)
+trim <- trim.pdb (protein, chain=Y, elety=Z)
+cut <- trim$atom$b
+plot <- plotb3 (cut, sse=trim, typ="l", ylab="Bfactor")
+
+```{r}
+ans <- function (X, Y, Z) {protein <-read.pdb (X)
+trim <- trim.pdb (protein, chain=Y, elety=Z) 
+cut <- trim$atom$b 
+plot <- plotb3 (cut, sse=trim, typ="l", ylab="Bfactor")
+}
+ans ("4AKE", "A", "CA")
+ans ("1AKE", "A", "CA")
+ans ("1E4Y", "A", "CA")
+```

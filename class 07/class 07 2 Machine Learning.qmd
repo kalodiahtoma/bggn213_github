@@ -1,0 +1,114 @@
+---
+title: "class 07: 2 Machine Learning"
+author: "Kalodiah Toma (PID: A07606689)"
+format: pdf
+---
+
+```{r}
+url <- "https://tinyurl.com/UK-foods"
+x <- read.csv(url, row.names=1)
+head(x)
+```
+Q1. How many rows and columns are in your new data frame named x? What R functions could you use to answer this questions?
+
+```{r}
+nrow(x)
+ncol(x)
+```
+```{r}
+head(x)
+tail(x)
+```
+```{r}
+pairs(x, col=rainbow(17), pch=16, cex=2)
+```
+Q2. Which approach to solving the ‘row-names problem’ mentioned above do you prefer and why? Is one approach more robust than another under certain circumstances?
+x <- read.csv(url, row.names=1)
+head(x)
+This is the preferred method as it it is not self distructive and will be transferred when rendering. 
+
+
+#PCA to the resuce 
+
+Help make sense of this data...
+The main function for PCA is base R is called `prcomp()`
+
+It wants the transpose (with the `t()`) of our food data for analysis
+```{r}
+dim(x)
+```
+```{r}
+t(x)
+```
+```{r}
+pca<-prcomp(t(x))
+summary(pca)
+```
+PC1 captures over 67% of data
+PC2 captures nearly 30% of data
+so if make a plot of PC1 AND PC1 have 97% of data. Do not need all 17 PC. 
+
+One of the main results that folks look for is called the "score plot" aka PC plot, PC1 vs PC2 plot....
+
+```{r}
+pca$x
+plot(pca$x[,1],pca$x[,2])
+```
+
+```{r}
+barplot(as.matrix(x), beside=T, col=rainbow(nrow(x)))
+```
+Q3: Changing what optional argument in the above barplot() function results in the following plot?
+leaving beside out or setting it to false sets the "value" of beside as "0)
+
+```{r}
+barplot(as.matrix(x), beside = 0, col=rainbow(nrow(x)))
+```
+Q5: Generating all pairwise plots may help somewhat. Can you make sense of the following code and resulting figure? What does it mean if a given point lies on the diagonal for a given plot?
+
+```{r}
+pairs(x, col=rainbow(10), pch=16)
+```
+
+
+Q6. What is the main differences between N. Ireland and the other countries of the UK in terms of this data-set?
+There is one variable (in blue) that is most different and higher in N.Ireland. It is difficult to know what this point is from this type of graph. This is likely alcoholic drinks.
+
+```{r}
+pca<-prcomp(t(x))
+summary(pca)
+```
+Q7. Complete the code below to generate a plot of PC1 vs PC2. The second line adds text labels over the data points.
+
+```{r}
+plot(pca$x[,1],pca$x[,2], xlab="PC1", ylab="PC2", xlim=c(-270,500))
+text(pca$x[,1], pca$x[,2], colnames(x))
+```
+Q8. Customize your plot so that the colors of the country names match the colors in our UK and Ireland map and table at start of this document.
+```{r}
+plot(pca$x[,1],pca$x[,2], xlab="PC1", ylab="PC2", xlim=c(-270,500))
+text(pca$x[,1], pca$x[,2], colnames(x), col=c("orange","red", "blue", "green")) 
+```
+```{r}
+v <- round( pca$sdev^2/sum(pca$sdev^2) * 100 )
+v
+```
+```{r}
+z <- summary(pca)
+z$importance
+```
+```{r}
+barplot(v, xlab="Principal Component", ylab="Percent Variation")
+```
+```{r}
+par(mar=c(10, 3, 0.35, 0))
+barplot( pca$rotation[,1], las=2 )
+```
+Q9: Generate a similar ‘loadings plot’ for PC2. What two food groups feature prominantely and what does PC2 maninly tell us about?
+
+```{r}
+par(mar=c(10, 3, 0.35, 0))
+barplot( pca$rotation[,2], las=2 )
+```
+PC2 mainly tells us the variance between Wales and Scotland. The two food groups that feature prominantely are "fresh potatoes" and "soft-drinks".
+
