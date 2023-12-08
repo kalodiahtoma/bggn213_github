@@ -1,0 +1,263 @@
+---
+title: "class 13"
+author: "Kalodiah Toma"
+format: pdf
+---
+```{r}
+#| message: false
+#| warning: false
+library(DESeq2)
+```
+The data for this hands-on session comes from a published RNA-seq experiment where airway smooth muscle cells were treated with dexamethasone, a synthetic glucocorticoid steroid with anti-inflammatory effects (Himes et al. 2014).
+
+counts <- read.csv("___", row.names=1)
+metadata <-  ___("airway_metadata.csv")
+```{r}
+counts <- read.csv("airway_scaledcounts.csv", row.names=1)
+metadata <-  read.csv("airway_metadata.csv")
+head(counts)
+head(metadata)
+```
+```{r}
+nrow(counts)
+sum(metadata$dex == "control")
+table(metadata$dex)
+```
+
+Q1. How many genes are in this dataset? 
+38694
+Q2. How many ‘control’ cell lines do we have? 
+4
+
+I want to compare the control to the treated columns. To do this I will:
+1. identify and extract the control columns from the metadata
+2. calculate the mean value per gene of the control columns and save as 'control.mean'
+3. do the same for the treated columns
+4. compare the 'control.mean' and 'treated.mean' values
+
+Step 1:
+```{r}
+control.inds<-metadata$dex=="control"
+control.mean<-rowMeans(counts[,control.inds])
+head(control.mean)
+```
+
+
+```{r}
+treated.inds<-metadata$dex=="treated"
+treated.mean<-rowMeans(counts[,treated.inds])
+head(treated.mean)
+#if you wrote the code in one step
+treated.mean<-rowMeans(counts[,metadata$dex=="treated"])
+```
+Q3. How would you make the above code in either approach more robust? Is there a function that could help here? 
+Because using "/4" will only give you values if you have four values. rowMeans will give you the means regardless of the number of values. 
+
+Q4. Follow the same procedure for the treated samples (i.e. calculate the mean per gene across drug treated samples and assign to a labeled vector called treated.mean)
+#treated.mean<-rowMeans(counts[,metadata$dex=="treated"])
+
+Q5 (a). Create a scatter plot showing the mean of the treated samples against the mean of the control samples. Your plot should look something like the following.
+
+```{r}
+meancounts <- data.frame(control.mean, treated.mean)
+plot(meancounts)
+```
+
+Q5 (b).You could also use the ggplot2 package to make this figure producing the plot below. What geom_?() function would you use for this plot?
+geom_point
+
+```{r}
+library(ggplot2)
+ggplot(meancounts)+
+  aes(control.mean, treated.mean)+
+  geom_point(alpha=0.2)
+```
+Q6.Try plotting both axes on a log scale. What is the argument to plot() that allows you to do this? 
+#plot(_meancounts__, log="xy")
+
+```{r}
+plot(meancounts, log="xy")
+```
+logs are super useful when we have such skewed data they are also handy when we are most interested in orders of magnitude change
+```{r}
+#treated/control
+log2(10/10)
+log2(20/10)
+log2(5/10)
+log2(40/10)
+```
+Add log2(Fold-change) value to our wee results table. 
+```{r}
+meancounts$log2fc<-log2(meancounts$treated/meancounts$control)
+head(meancounts)
+```
+I need to exclude any genes with zero counts as we can't say anything about then anyway from this experiment and it causes me math pain. 
+```{r}
+#What values in the first two columns are zero
+to.rm.inds <- rowSums(meancounts[,1:2]==0) > 0
+mycounts<-meancounts[!to.rm.inds,] 
+```
+Q7. What is the purpose of the arr.ind argument in the which() function call above? Why would we then take the first column of the output and need to call the unique() function?
+The arr.ind=TRUE argument will clause which() to return both the row and column indices (i.e. positions) where there are TRUE values. In this case this will tell us which genes (rows) and samples (columns) have zero counts. We are going to ignore any genes that have zero counts in any sample so we just focus on the row answer. Calling unique() will ensure we don’t count any row twice if it has zero entries in both samples. 
+
+How many genes do T have left?
+21817
+```{r}
+nrow(mycounts)
+sum(mycounts$log2fc > +2)
+sum(mycounts$log2fc < -2)
+```
+Q8. Using the up.ind vector above can you determine how many up regulated genes we have at the greater than 2 fc level? 
+250
+
+Q9. Using the down.ind vector above can you determine how many down regulated genes we have at the greater than 2 fc level? 
+367
+
+Q10. Do you trust these results? Why or why not?
+Is this data statistically significant? However, fold change can be large (e.g. >>two-fold up- or down-regulation) without being statistically significant (e.g. based on p-values). We have not done anything yet to determine whether the differences we are seeing are significant.
+
+##Running DESeq2
+
+Like many bioconductor packages DESeq2 wants it's input in a very particular way. 
+
+```{r}
+dds <- DESeqDataSetFromMatrix(countData = counts, 
+                       colData = metadata, 
+                       design = ~dex)
+```
+To run DESeq analysis we call the main function from the package called 'DESeq(dds)'
+```{r}
+dds <- DESeq(dds)
+```
+To get the results out of this 'dds' object we can use the DESeq 'results()' function. 
+```{r}
+res <- results(dds)
+head(res)
+```
+
+A common summary visualization is called a Volcano plot. 
+
+```{r}
+plot(res$log2FoldChange, -log(res$padj),
+     xlab="Log2 Fold-Change", 
+     ylab="-log P-value")
+abline(v=c(2,-2), col="red")
+abline(h=-log(0.05), col="blue")
+```
+```{r}
+mycols<-rep("gray", nrow(res))
+mycols
+plot(res$log2FoldChange, -log(res$padj), col=mycols,
+     xlab="Log2 Fold-Change", 
+     ylab="-log P-value")
+abline(v=c(2,-2), col="red")
+abline(h=-log(0.05), col="blue")
+```
+
+```{r}
+mycols[res$log2FoldChange > 2 ]  <- "black" 
+mycols[res$log2FoldChange < -2 ]  <- "black" 
+mycols[res$padj > 0.05] <- "gray"
+```
+
+```{r}
+plot(res$log2FoldChange, -log(res$padj), col=mycols,
+     xlab="Log2 Fold-Change", 
+     ylab="-log P-value")
+abline(v=c(2,-2), col="red")
+abline(h=-log(0.05), col="blue")
+```
+#save our results to data
+```{r}
+write.csv(res, file="myresults.csv")
+```
+#Adding annotation data
+
+We need to translate or "map" or ensemble IDs into more understable gene maps and the identifers that other usefil databases use. 
+
+```{r}
+library("AnnotationDbi")
+library("org.Hs.eg.db")
+```
+
+```{r}
+columns(org.Hs.eg.db)
+```
+
+```{r}
+res$symbol <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",   # The format of our genenames
+                     column="SYMBOL",     # The new format we want to add
+                     multiVals="first")
+```
+
+```{r}
+head(res)
+```
+Q11. Run the mapIds() function two more times to add the Entrez ID and UniProt accession and GENENAME as new columns called res$entrez, res$uniprot and res$genename.
+
+```{r}
+res$entrez <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",   # The format of our genenames
+                     column="ENTREZID",     # The new format we want to add
+                     multiVals="first")
+head(res)
+```
+
+```{r}
+res$uniport <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",   # The format of our genenames
+                     column="UNIPROT",     # The new format we want to add
+                     multiVals="first")
+head(res)
+```
+```{r}
+res$genename <- mapIds(org.Hs.eg.db,
+                     keys=row.names(res), # Our genenames
+                     keytype="ENSEMBL",   # The format of our genenames
+                     column="GENENAME",     # The new format we want to add
+                     multiVals="first")
+head(res)
+```
+##Pathway Analysis
+
+```{r}
+library(pathview)
+library(gage)
+library(gageData)
+
+data(kegg.sets.hs)
+
+# Examine the first 2 pathways in this kegg set for humans
+head(kegg.sets.hs, 2)
+```
+```{r}
+foldchanges = res$log2FoldChange
+names(foldchanges) = res$entrez
+head(foldchanges)
+```
+```{r}
+keggres = gage(foldchanges, gsets=kegg.sets.hs)
+```
+
+```{r}
+attributes(keggres)
+```
+```{r}
+head(keggres$less, 3)
+```
+lets have a look at one of these pathways
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa05310")
+```
+
+```{r}
+pathview(gene.data=foldchanges, pathway.id="hsa05332")
+pathview(gene.data=foldchanges, pathway.id="hsa04940")
+```
+![](hsa05310.pathview.png)
+![](hsa04940.pathview.png)
+![](hsa05332.pathview.png)
