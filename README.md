@@ -1,7 +1,18 @@
 # bggn213_github
 My classwork from [BGGN213](https://bioboot.github.io/bggn213_F23/) at UC San Diego (Fall 2023) 
 
+- Class 04: [Data exploration and visualization in R](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class04.qmd)
 - Class 05: [Data vis with GGPLOT](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class05.md)
 - Class 06: [R functions](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class06.qmd)
 - Class 07: [Bioinformatics R package from CRAN and BioConductor](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class07.qmd)
-
+- Class 08: [Machine learning](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class08.qmd)
+- Class 09: [Unsupervised learning mini-project](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class09.qmd)
+- Class 10: [Structural Bioinformatics](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class10.qmd)
+- Class 11: [Bioinformatics in drug discovery and design](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class11.qmd)
+- Class 13: [Genome informatics and high throughput sequencing](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class13.qmd)
+- Class 14: [Transcriptomics and the analysis of RNA-Seq data](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class14.qmd)
+- Class 16: [Genome annotation and the interpretation of gene lists](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class17.qmd)
+- Class 17: [Essential UNIX for bioinformatics](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class17.qmd)
+- Class 18: [Biological network analysis](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class18.qmd)
+- Class 19: [Cancer genomics](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/class19.qmd)
+- Find a gene project: [Project](https://github.com/kalodiahtoma/bggn213_github/blob/main/class%2005/findagene.qmd)
